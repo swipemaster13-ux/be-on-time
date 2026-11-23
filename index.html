@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light only">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Be On Time Rentals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@500&family=Hind:wght@400;500;600&display=swap">
+<style>
+/* Layout: bright white app bar with a segmented view switch over one centred working column. Soft UI Evolution (ui-ux-pro-max: booking app): trust blue drives navigation, green = available, grey = booked, tangerine = confirm money/handover, plate yellow only marks vehicle plates */
+:root{
+  --bg:#F5F6F8; --surface:#FFFFFF; --ink:#101217; --muted:#5E6472; --line:#E4E6EB;
+  --brand:#2160F3; --brand-ink:#FFFFFF; --soft:#EEF3FF; --idle-bg:#EEF0F3; --idle:#5E6472;
+  --band:#FFFFFF; --band-ink:#101217; --alert:#EF3A2D;
+  --accent:#EA4B0F; --accent-ink:#FFFFFF; --ring:rgba(33,96,243,.22);
+  --plate:#FFD23F; --plate-ink:#1A1400;
+  --ok:#0F7A52; --ok-bg:#E3F5EC; --warn:#A8530A; --warn-bg:#FFF2DD; --bad:#CF2E22; --bad-bg:#FDE8E6;
+  --shadow:0 1px 2px rgba(15,23,42,.05),0 4px 14px rgba(15,23,42,.06);
+  --f-display:"DM Sans","Hind",system-ui,sans-serif; --f-body:"DM Sans","Hind",system-ui,sans-serif; --f-mono:"DM Mono",ui-monospace,monospace;
+  --r:12px; color-scheme:light; --dur:220ms; --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.025em;font-weight:650}
+.wrap{max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.band{background:var(--band);color:var(--band-ink);border-bottom:1px solid var(--line);margin-top:calc(-1 * env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
+header .wrap{padding-block:16px;display:flex;flex-direction:column;gap:14px}
+.brandrow{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:11px}
+.logo svg{flex:none}
+.logo b{font-family:var(--f-display);font-size:1.08rem;font-weight:700;letter-spacing:-.02em;display:block;line-height:1.2}
+.logo small{color:var(--muted);font-size:.8rem}
+.demo-tag{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;background:var(--plate);color:var(--plate-ink);padding:4px 9px;border-radius:6px;font-weight:600;border:1.5px solid var(--plate-ink)}
+.tabs{display:inline-flex;align-self:flex-start;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px}
+.tabs button{font:600 .92rem var(--f-display);letter-spacing:-.01em;border:0;background:transparent;color:var(--muted);display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;cursor:pointer;transition:background .15s,color .15s}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+main{padding-block:26px 56px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.pad{padding:24px}
+@media (max-width:620px){.pad{padding:18px}}
+.muted{color:var(--muted)}
+.mono{font-family:var(--f-mono);font-size:.86em;letter-spacing:.01em}
+/* stepper */
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:16px;list-style:none;padding:0}
+.steps li{font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.steps li::before{content:"";height:4px;border-radius:2px;background:var(--line)}
+.steps li.done::before{background:var(--brand)}
+.steps li.now::before{background:var(--accent)}
+.steps li.now{color:var(--ink);font-weight:600}
+.panel h2{font-size:1.3rem}
+.stepnow{display:block;margin:-4px 0 14px;font-size:.88rem;color:var(--muted)}
+.stepnow b{color:var(--ink)}
+.tbadge{background:var(--alert);color:#fff;font:600 .72rem var(--f-body);min-width:20px;height:20px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+input[type=file]{color:var(--muted);font-size:.85rem;padding:0;background:transparent;border:0}
+input[type=file]::file-selector-button{font:600 .85rem var(--f-display);background:var(--soft);color:var(--brand);border:1px solid var(--line);border-radius:8px;padding:9px 14px;margin-right:10px;cursor:pointer}
+a.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.done-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.done-actions .btn.go{margin-right:auto}
+.sigchip{background:#fff;border:1px solid var(--line);border-radius:8px;padding:4px 10px;display:inline-block}
+.note{background:var(--warn-bg);color:var(--warn);border-radius:8px;padding:8px 12px;font-size:.9rem}
+.panel .sub{margin:4px 0 18px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:620px){.grid2{grid-template-columns:1fr}.steps li span{display:none}.done-actions{flex-direction:column;align-items:stretch}.done-actions .btn.go{margin-right:0}}
+label.f{display:block;font-weight:500;font-size:.92rem}
+label.f .hi{font-weight:400;color:var(--muted);font-size:.84rem;margin-left:6px}
+label.f>input,label.f>select,label.f>textarea{display:block;margin-top:6px}
+input,select,textarea{font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 13px;width:100%;min-width:0;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px var(--ring)}
+button:focus-visible,a.btn:focus-visible{outline:2.5px solid var(--brand);outline-offset:2px}
+.err{color:var(--bad);font-size:.85rem;min-height:1.2em}
+.actions{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:20px;flex-wrap:wrap}
+.btn{font:600 .95rem var(--f-display);letter-spacing:-.01em;border-radius:10px;padding:12px 20px;transition:transform var(--dur) var(--ease),filter var(--dur),background var(--dur);cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 8px 20px -10px var(--accent)}
+.btn:hover:not(:disabled){filter:brightness(1.06)}.btn:active:not(:disabled){transform:translateY(1px)}
+.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.small{padding:8px 14px;font-size:.88rem}
+.tabs button{min-height:40px}
+.pill.idle{background:var(--idle-bg);color:var(--idle)}
+svg.lucide{width:18px;height:18px;flex:none;stroke-width:2}
+.stat small{display:flex;align-items:center;gap:6px}.stat small svg.lucide{width:15px;height:15px}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:sp .7s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:20;display:flex;gap:8px;align-items:center;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion:no-preference){.toast{animation:tin var(--dur) var(--ease)}@keyframes tin{from{opacity:0;transform:translate(-50%,8px)}}
+.stats>.card,.list>.card,.fleet>.card{animation:rise 320ms var(--ease) both}@keyframes rise{from{opacity:.6;transform:translateY(6px)}}
+.stats>.card:nth-child(2),.list>.card:nth-child(2),.fleet>.card:nth-child(2){animation-delay:50ms}.stats>.card:nth-child(3),.list>.card:nth-child(3),.fleet>.card:nth-child(3){animation-delay:100ms}.stats>.card:nth-child(4),.list>.card:nth-child(4),.fleet>.card:nth-child(4){animation-delay:150ms}.fleet>.card:nth-child(n+5){animation-delay:200ms}}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.quote{margin-top:16px;background:var(--soft);border-radius:10px;padding:14px 16px;display:flex;gap:20px;flex-wrap:wrap}
+.quote div{display:flex;flex-direction:column}
+.quote small{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+.quote strong{font-family:var(--f-display);font-size:1.15rem;font-variant-numeric:tabular-nums}
+.upl{border:1.5px dashed var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;background:var(--bg)}
+.upl img{max-height:120px;border-radius:8px;border:1px solid var(--line)}
+.upl input{padding:6px;background:transparent;border:0}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.85rem;margin:16px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.digi{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;padding:14px 16px;border-radius:10px;border:1px solid var(--line)}
+.ok-line{color:var(--ok);font-weight:600}
+.terms{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 16px;background:var(--bg)}
+.terms ol{list-style:none;padding:0;margin:0}
+.terms li{padding:10px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:42px 1fr;gap:6px;font-size:.92rem}
+.terms li:last-child{border-bottom:0}
+.terms .n{font-family:var(--f-mono);color:var(--brand);font-size:.8rem;padding-top:2px}
+.terms .h{color:var(--muted);display:block;font-size:.88rem}
+.check{display:flex;gap:10px;align-items:flex-start;margin:16px 0 6px;font-weight:500}
+.check input{width:20px;height:20px;flex:none;margin-top:2px;accent-color:var(--brand)}
+.check input:focus{outline:none}.check input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sigbox{position:relative;border:1.5px solid var(--line);border-radius:10px;background:#FFFFFF;touch-action:none}
+.sigbox canvas{display:block;width:100%;height:160px;cursor:crosshair}
+.sigbox .hint{position:absolute;left:14px;bottom:8px;font-size:.8rem;color:#5A6B78;pointer-events:none}
+.sigbox .base{position:absolute;left:14px;right:14px;bottom:30px;border-top:1px dashed #B9C6CF;pointer-events:none}
+.paygrid{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+@media (max-width:620px){.paygrid{grid-template-columns:1fr;justify-items:center}}
+.qr{background:#fff;padding:12px;border-radius:12px;border:1px solid var(--line);text-align:center}
+.qr canvas{width:180px;height:180px;display:block}
+.qr small{display:block;color:#56687A;font-size:.75rem;margin-top:6px}
+table.bill{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+table.bill td{padding:8px 0;border-bottom:1px solid var(--line)}
+table.bill td:last-child{text-align:right;white-space:nowrap;padding-left:12px}
+table.bill tr.total td{font-family:var(--f-display);font-weight:600;font-size:1.1rem;border-bottom:0}
+.success{display:flex;flex-direction:column;gap:16px}
+.ticket{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ticket .top{background:var(--brand);color:var(--brand-ink);padding:14px 18px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.ticket dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:12px 18px;margin:0;padding:16px 18px}
+.ticket dt{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.ticket dd{margin:0;font-weight:600}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;padding:0 18px 16px}
+.thumbs img{width:84px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+/* dashboard */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+@media (max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{padding:14px 16px}
+.stat small{color:var(--muted);font-size:.8rem;display:block}
+.stat strong{font-family:var(--f-display);font-weight:650;letter-spacing:-.03em;font-size:1.9rem;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat.alert{border-color:var(--bad)} .stat.alert strong{color:var(--bad)}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:8px 0 12px;flex-wrap:wrap}
+.sec-h h2{font-size:1.15rem}
+.list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.rent{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.rent .row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.rent .who b{font-family:var(--f-display);font-size:1.02rem}
+.rent .meta{display:flex;gap:16px;flex-wrap:wrap;font-size:.88rem;color:var(--muted)}
+.pill{font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.neutral{background:var(--soft);color:var(--brand)}
+.ex{font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+.retbox{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:12px}
+.retgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:620px){.retgrid{grid-template-columns:1fr}}
+.settle{padding:12px 14px;border-radius:10px;font-weight:600;font-family:var(--f-display)}
+.settle.collect{background:var(--warn-bg);color:var(--warn)} .settle.refund{background:var(--ok-bg);color:var(--ok)}
+.fleet{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:28px}
+.bike{padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.bike .plate{font-family:var(--f-mono);font-weight:600;font-size:.78rem;background:var(--plate);color:var(--plate-ink);align-self:flex-start;padding:3px 8px;border-radius:5px;border:1.5px solid var(--plate-ink)}
+footer{border-top:1px solid var(--line);padding-block:18px;font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+@media (prefers-reduced-motion:no-preference){.panel{animation:in .25s ease}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="wrap">
+    <div class="brandrow">
+      <div class="logo">
+        <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><path d="M19 3c-6.6 0-12 5.2-12 11.7C7 23.4 19 35 19 35s12-11.6 12-20.3C31 8.2 25.6 3 19 3z" fill="var(--accent)"/><circle cx="19" cy="14.5" r="6.2" fill="none" stroke="var(--accent-ink)" stroke-width="2"/><path d="M19 10.5v4l2.6 1.6" fill="none" stroke="var(--accent-ink)" stroke-width="2" stroke-linecap="round"/></svg>
+        <div><b>Be On Time Multi Service</b><small>Bike rental · Link Road, Bilaspur</small></div>
+      </div>
+      <span class="demo-tag">Demo</span>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" id="tab-cust" aria-selected="true" data-view="cust"><i data-lucide="file-pen-line" aria-hidden="true"></i>New rental</button>
+      <button role="tab" id="tab-own" aria-selected="false" data-view="own"><i data-lucide="layout-dashboard" aria-hidden="true"></i>Owner dashboard <span class="tbadge" id="odBadge" hidden></span></button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="view-cust"></section>
+  <section id="view-own" hidden></section>
+</main>
+
+<footer class="wrap">
+  <span>Be On Time Multi Service Pvt. Ltd. · Plot No. A-99, Link Road, Bilaspur (C.G.) 495001 · Lic. No. CG/STA/L.R.M/02/2023</span>
+  <span>Demo build: rates, deposit and per-km charge are sample values. Data stays in this browser only.</span>
+  <button class="btn small" id="resetDemo">Reset demo</button>
+</footer>
+
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script>
+const FLEET=[
+ {id:"CG 10 AB 1234",model:"Honda Activa 6G",day:500},
+ {id:"CG 10 AC 5678",model:"TVS Jupiter",day:450},
+ {id:"CG 10 AD 2211",model:"Bajaj Pulsar 150",day:700},
+ {id:"CG 10 AE 9087",model:"Royal Enfield Classic 350",day:1200},
+ {id:"CG 10 AF 4410",model:"Hero Splendor Plus",day:400},
+ {id:"CG 10 AG 7302",model:"Honda Shine",day:450}];
+const DEPOSIT=1000, PER_KM=4, H=3600e3;
+const TERMS=[
+ ["1.1","I will not cross the speed limit while riding.","मैं गति सीमा का उल्लंघन नहीं करूंगा।"],
+ ["1.2","Not more than 2 people on the bike.","मोटरसाइकिल पर 2 से अधिक व्यक्ति नहीं बैठेंगे।"],
+ ["1.5","The bike is for my own use only; I will not give it to anyone else.","वाहन केवल मेरे स्वयं के उपयोग हेतु है, किसी अन्य को नहीं दूंगा।"],
+ ["1.6","I will not ride under the influence of alcohol or drugs.","नशे की हालत में वाहन नहीं चलाऊंगा।"],
+ ["1.9","I will wear a helmet at all times.","वाहन चलाते समय हेलमेट पहनूंगा।"],
+ ["1.10","I am responsible for any damage, theft or legal case while the bike is with me.","मेरे पास रहते हुए किसी भी क्षति/चोरी/कानूनी मामले की जिम्मेदारी मेरी होगी।"],
+ ["1.13","Km limit: 9 km per hour, 80 km per 12 hours, 120 km per 24 hours. Extra km is chargeable.","कि.मी. सीमा: 9 कि.मी./घंटा, 80 कि.मी./12 घंटा, 120 कि.मी./24 घंटा। अधिक पर शुल्क।"],
+ ["1.15","Late return is charged at double the daily rate.","समय पर वापस न करने पर दोगुना किराया लगेगा।"],
+ ["2.5","Any e-challan received within 2 months of the rental is paid by the hirer.","किराये की अवधि का ई-चालान 2 माह के भीतर आने पर ग्राहक भरेगा।"],
+ ["2.6","All cases fall under Bilaspur (C.G.) jurisdiction.","सभी मामले बिलासपुर (छ.ग.) न्यायालय के अधीन होंगे।"],
+ ["3.1","The hirer will always lock and park the bike in a safe place.","ग्राहक वाहन को सुरक्षित स्थान पर लॉक करके रखेगा।"]];
+
+/* ---------- storage ---------- */
+let rentals=[], seq=1031;
+function seed(){
+  const now=Date.now(); rentals=[
+   {no:"B/T/1027",name:"Rohit Sahu",father:"Mahesh Sahu",phone:"9826012345",bike:"CG 10 AD 2211",start:now-30*H,due:now-3*H,startKm:12840,paid:1400,notes:"Scratch on rear mudguard",status:"OUT",example:true,photos:[]},
+   {no:"B/T/1028",name:"Anjali Verma",father:"Suresh Verma",phone:"9179054321",bike:"CG 10 AB 1234",start:now-10*H,due:now+1.2*H,startKm:8410,paid:300,status:"OUT",example:true,photos:[]},
+   {no:"B/T/1029",name:"Imran Khan",father:"Salim Khan",phone:"7000123456",bike:"CG 10 AE 9087",start:now-4*H,due:now+20*H,startKm:22105,paid:1200,status:"OUT",example:true,photos:[]},
+   {no:"B/T/1030",name:"Priya Patel",father:"Ramesh Patel",phone:"9893345678",bike:"CG 10 AF 4410",start:now-27*H,due:now-2.5*H,startKm:5320,paid:400,status:"RETURNED",example:true,returned:{at:now-2*H,endKm:5431,extra:0,net:-1000},photos:[]}];
+  seq=1031;
+}
+function save(){try{localStorage.setItem("vot-demo",JSON.stringify({rentals:rentals.map(r=>({...r,photos:[]})),seq}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem("vot-demo"));if(d&&d.rentals){rentals=d.rentals;seq=d.seq;return}}catch(e){} seed()}
+load();
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const inr=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const fmt=t=>new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});
+const toInput=t=>{const d=new Date(t-new Date(t).getTimezoneOffset()*6e4);return d.toISOString().slice(0,16)};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const bikeOf=id=>FLEET.find(b=>b.id===id);
+function quote(bike,start,due){
+  const h=Math.max(1,Math.ceil((due-start)/H)), days=Math.floor(h/24), rem=h%24;
+  const rent=days*bike.day+(rem===0?0:rem<=12?Math.round(bike.day*.6):bike.day);
+  const km=days*120+(rem===0?0:rem<=8?rem*9:rem<=12?80:120);
+  return {h,rent,km};
+}
+const dur=ms=>{const m=Math.max(1,Math.round(ms/6e4)),h=Math.floor(m/60);return h?(m%60?`${h} h ${m%60} min`:`${h} h`):`${m} min`};
+function statusOf(r){
+  const left=r.due-Date.now();
+  if(left<0) return ["bad","Overdue "+dur(-left)];
+  if(left<=2*H) return ["warn","Due in "+dur(left)];
+  return ["ok","On time"];
+}
+function updBadge(){const n=rentals.filter(r=>r.status==="OUT"&&r.due<Date.now()).length,b=$("#odBadge");b.hidden=!n;b.textContent=n;b.setAttribute("aria-label",n+" overdue")}
+
+/* ---------- views ---------- */
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.view)));
+function show(v){
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.view===v));
+  $("#view-cust").hidden=v!=="cust"; $("#view-own").hidden=v!=="own";
+  if(v==="own") renderOwner();
+}
+
+/* ---------- customer flow ---------- */
+const STEPS=["Details","ID proof","Sign","Payment","Handover"];
+let step=0, draft={};
+function freshDraft(){const s=Date.now()+15*6e4;draft={name:"",father:"",phone:"",bike:"",start:s,due:s+24*H,dl:"",idOk:false,idVia:"",dlImg:"",aadImg:"",agreed:false,signed:false,sigImg:"",paid:false,startKm:"",fuel:"Half",photos:[]}}
+freshDraft();
+
+function icons(){try{window.lucide&&lucide.createIcons()}catch(e){}}
+function busy(btn,label,cb){btn.disabled=true;btn.innerHTML='<span class="spin" aria-hidden="true"></span>'+label;setTimeout(cb,550)}
+function toast(msg){const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.innerHTML='<i data-lucide="circle-check" aria-hidden="true"></i>'+msg;document.body.appendChild(t);icons();setTimeout(()=>t.remove(),2800)}
+function renderCust(){
+  const el=$("#view-cust");
+  if(step===5){el.innerHTML=doneHTML();bindDone();icons();return}
+  el.innerHTML=`<ol class="steps">${STEPS.map((s,i)=>`<li class="${i<step?"done":i===step?"now":""}"><span>${s}</span></li>`).join("")}</ol>
+  <p class="stepnow">Step ${step+1} of 5 · <b>${STEPS[step]}</b></p>
+  <div class="card pad panel">${[s1,s2,s3,s4,s5][step]()}</div>`;
+  [b1,b2,b3,b4,b5][step]();icons();
+}
+function nav(back=true,nextLabel="Continue",cls="primary"){return `<p class="err" id="err" role="alert"></p><div class="actions">${back?`<button class="btn" id="back">Back</button>`:"<span></span>"}<button class="btn ${cls}" id="next">${nextLabel}</button></div>`}
+function bindBack(){const b=$("#back");if(b)b.onclick=()=>{step--;renderCust()}}
+function fail(m){$("#err").textContent=m;return false}
+
+function s1(){
+  const out=new Set(rentals.filter(r=>r.status==="OUT").map(r=>r.bike));
+  if(!draft.bike||out.has(draft.bike)){const f=FLEET.find(b=>!out.has(b.id));draft.bike=f?f.id:""}
+  return `<h2>Rental details</h2><p class="sub">Customer fills this on their own phone after scanning the counter QR.</p>
+  <div class="grid2">
+   <label class="f">Full name <span class="hi">पूरा नाम</span><input id="f-name" value="${esc(draft.name)}" autocomplete="name"></label>
+   <label class="f">Father's name <span class="hi">पिता का नाम</span><input id="f-father" value="${esc(draft.father)}"></label>
+   <label class="f">Mobile number <span class="hi">मोबाइल नंबर</span><input id="f-phone" inputmode="numeric" maxlength="10" value="${esc(draft.phone)}" placeholder="10 digits"></label>
+   <label class="f">Bike <span class="hi">वाहन</span><select id="f-bike"><option value="">Choose an available bike</option>${FLEET.map(b=>`<option value="${b.id}" ${out.has(b.id)?"disabled":""} ${draft.bike===b.id?"selected":""}>${b.model} · ${b.id} · ${inr(b.day)}/day${out.has(b.id)?" (out)":""}</option>`).join("")}</select></label>
+   <label class="f">Pick-up time <span class="hi">से</span><input type="datetime-local" id="f-start" value="${toInput(draft.start)}"></label>
+   <label class="f">Return time <span class="hi">तक</span><input type="datetime-local" id="f-due" value="${toInput(draft.due)}"></label>
+  </div>
+  <div class="quote" id="quote"></div>${nav(false)}`;
+}
+function b1(){
+  const upd=()=>{
+    const s=new Date($("#f-start").value).getTime(), d=new Date($("#f-due").value).getTime(), b=bikeOf($("#f-bike").value);
+    if(!b||!(d>s)){$("#quote").innerHTML=`<div><small>Estimate</small><strong class="muted" style="font-size:1rem">Choose a bike and times to see rent</strong></div>`;return}
+    const q=quote(b,s,d);
+    $("#quote").innerHTML=`<div><small>Duration</small><strong>${q.h} h</strong></div><div><small>Rent</small><strong>${inr(q.rent)}</strong></div><div><small>Deposit (refundable)</small><strong>${inr(DEPOSIT)}</strong></div><div><small>Free km</small><strong>${q.km} km</strong></div>`;
+  };
+  ["#f-bike","#f-start","#f-due"].forEach(s=>$(s).addEventListener("input",upd)); upd();
+  $("#next").onclick=()=>{
+    const v=id=>$(id).value.trim();
+    draft.name=v("#f-name");draft.father=v("#f-father");draft.phone=v("#f-phone");draft.bike=v("#f-bike");
+    draft.start=new Date(v("#f-start")).getTime();draft.due=new Date(v("#f-due")).getTime();
+    if(draft.name.length<2) return fail("Enter the customer's full name.");
+    if(draft.father.length<2) return fail("Enter the father's name, as on the paper form.");
+    if(!/^[6-9]\d{9}$/.test(draft.phone)) return fail("Enter a 10-digit Indian mobile number.");
+    if(!draft.bike) return fail("Choose a bike.");
+    if(!(draft.due>draft.start)) return fail("Return time must be after pick-up time.");
+    step=1;renderCust();
+  };
+}
+
+function s2(){
+  return `<h2>ID proof</h2><p class="sub">No photocopies. Share from DigiLocker, or take photos of the documents.</p>
+  <div class="digi"><div><b>DigiLocker</b><div class="muted" style="font-size:.9rem">Driving licence + Aadhaar, verified by the government app</div></div>
+   ${draft.idVia==="digilocker"?`<span class="ok-line" style="display:inline-flex;gap:6px;align-items:center"><i data-lucide="shield-check" aria-hidden="true"></i>Documents received</span>`:`<button class="btn primary small" id="digi"><i data-lucide="shield-check" aria-hidden="true"></i>Share from DigiLocker</button>`}</div>
+  <div class="or">or upload photos</div>
+  <label class="f" style="margin-bottom:14px">Driving licence number <span class="hi">ड्राइविंग लाइसेंस नंबर</span><input id="f-dl" value="${esc(draft.dl)}" placeholder="CG10 20190012345"></label>
+  <div class="grid2">
+   <div class="upl"><b>Driving licence photo</b><input type="file" accept="image/*" capture="environment" id="up-dl">${draft.dlImg?`<img src="${draft.dlImg}" alt="Driving licence preview">`:""}</div>
+   <div class="upl"><b>Aadhaar photo</b><input type="file" accept="image/*" capture="environment" id="up-aad">${draft.aadImg?`<img src="${draft.aadImg}" alt="Aadhaar preview">`:""}</div>
+  </div>${nav()}`;
+}
+function readImg(input,cb){input.addEventListener("change",()=>{const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(f)})}
+function b2(){
+  bindBack();
+  const keep=()=>draft.dl=$("#f-dl").value.trim();
+  const d=$("#digi"); if(d) d.onclick=()=>{keep();draft.idVia="digilocker";renderCust()};
+  readImg($("#up-dl"),u=>{keep();draft.dlImg=u;renderCust()});
+  readImg($("#up-aad"),u=>{keep();draft.aadImg=u;renderCust()});
+  $("#next").onclick=()=>{keep();
+    if(draft.idVia!=="digilocker"){
+      if(draft.dl.length<6) return fail("Enter the driving licence number, or share from DigiLocker.");
+      if(!draft.dlImg||!draft.aadImg) return fail("Add photos of both the driving licence and Aadhaar.");
+      draft.idVia="photos";
+    }
+    step=2;renderCust();
+  };
+}
+
+function s3(){
+  const b=bikeOf(draft.bike);
+  return `<h2>Terms and signature</h2><p class="sub">Same rules as the paper contract, in English and Hindi.</p>
+  <div class="terms"><ol>${TERMS.map(t=>`<li><span class="n">${t[0]}</span><span>${t[1]}<span class="h">${t[2]}</span></span></li>`).join("")}</ol></div>
+  <label class="check"><input type="checkbox" id="agree" ${draft.agreed?"checked":""}><span>I, ${esc(draft.name)}, S/D/W of ${esc(draft.father)}, have read all the terms and take vehicle ${esc(b.id)} from ${fmt(draft.start)} to ${fmt(draft.due)} for my personal use. The full responsibility of the vehicle is mine.</span></label>
+  <p class="muted" style="margin:14px 0 6px;font-size:.9rem">Sign with your finger</p>
+  <div class="sigbox"><canvas id="sig"></canvas><div class="base"></div><span class="hint">Sign above the line</span></div>
+  <div style="margin-top:8px"><button class="btn small" id="clearSig">Clear signature</button></div>${nav()}`;
+}
+function b3(){
+  bindBack();
+  const c=$("#sig"),ctx=c.getContext("2d"),dpr=window.devicePixelRatio||1;
+  const size=()=>{const r=c.getBoundingClientRect();c.width=r.width*dpr;c.height=r.height*dpr;ctx.scale(dpr,dpr);ctx.lineWidth=2.4;ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#0E1E2B"};
+  size(); let drawing=false, strokes=0;
+  const pos=e=>{const r=c.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]};
+  c.addEventListener("pointerdown",e=>{drawing=true;c.setPointerCapture(e.pointerId);const[x,y]=pos(e);ctx.beginPath();ctx.moveTo(x,y)});
+  c.addEventListener("pointermove",e=>{if(!drawing)return;const[x,y]=pos(e);ctx.lineTo(x,y);ctx.stroke();strokes++});
+  c.addEventListener("pointerup",()=>drawing=false);
+  $("#clearSig").onclick=()=>{ctx.clearRect(0,0,c.width,c.height);strokes=0};
+  $("#next").onclick=()=>{
+    draft.agreed=$("#agree").checked;
+    if(!draft.agreed) return fail("Tick the box to agree to the terms.");
+    if(strokes<8) return fail("Please sign in the box.");
+    draft.sigImg=c.toDataURL();draft.signed=true;step=3;renderCust();
+  };
+}
+
+function s4(){
+  const q=quote(bikeOf(draft.bike),draft.start,draft.due);
+  return `<h2>Payment</h2><p class="sub">Customer scans the shop's UPI QR. Staff confirms once the money arrives.</p>
+  <div class="paygrid">
+   <div class="qr"><canvas id="qr" width="180" height="180"></canvas><small><b style="color:#0E1E2B">vontime@sbi</b><br>Sample QR · not payable</small></div>
+   <table class="bill"><tbody>
+    <tr><td>Rent (${q.h} h)</td><td>${inr(q.rent)}</td></tr>
+    <tr><td>Security deposit, refundable</td><td>${inr(DEPOSIT)}</td></tr>
+    <tr class="total"><td>Pay now</td><td>${inr(q.rent+DEPOSIT)}</td></tr>
+   </tbody></table>
+  </div>${nav(true,"Payment received","go")}`;
+}
+function b4(){
+  bindBack();
+  const c=$("#qr"),x=c.getContext("2d"),n=29,m=180/n;let s=7;
+  const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
+  x.fillStyle="#fff";x.fillRect(0,0,180,180);x.fillStyle="#0E1E2B";
+  const fin=(a,b)=>{x.fillRect(a*m,b*m,7*m,7*m);x.fillStyle="#fff";x.fillRect((a+1)*m,(b+1)*m,5*m,5*m);x.fillStyle="#0E1E2B";x.fillRect((a+2)*m,(b+2)*m,3*m,3*m)};
+  for(let i=0;i<n;i++)for(let j=0;j<n;j++){const inF=(i<8&&j<8)||(i>n-9&&j<8)||(i<8&&j>n-9);if(!inF&&rnd()>.52)x.fillRect(i*m,j*m,m+.3,m+.3)}
+  fin(0,0);fin(n-7,0);fin(0,n-7);
+  $("#next").onclick=e=>busy(e.currentTarget,"Confirming payment",()=>{draft.paid=true;step=4;renderCust()});
+}
+
+function s5(){
+  return `<h2>Bike handover</h2><p class="sub">Staff records the bike's condition before it leaves. This settles any damage question at return.</p>
+  <div class="grid2">
+   <label class="f">Odometer reading (km) <span class="hi">मीटर रीडिंग</span><input id="f-km" inputmode="numeric" value="${esc(draft.startKm)}" placeholder="e.g. 12840"></label>
+   <label class="f">Fuel level <span class="hi">पेट्रोल</span><select id="f-fuel">${["Reserve","Quarter","Half","Three-quarter","Full"].map(f=>`<option ${draft.fuel===f?"selected":""}>${f}</option>`).join("")}</select></label>
+  </div>
+  <label class="f" style="margin-top:14px">Existing scratches or dents <span class="hi">पहले से मौजूद खरोंच</span><textarea id="f-notes" rows="2" placeholder="e.g. small scratch on left mirror">${esc(draft.notes||"")}</textarea></label>
+  <div class="upl" style="margin-top:14px"><b>Bike photos: all sides, odometer, existing scratches</b><input type="file" accept="image/*" capture="environment" multiple id="up-bike">
+   ${draft.photos.length?`<div class="thumbs" style="padding:0">${draft.photos.map((p,i)=>`<img src="${p}" alt="Handover photo ${i+1}">`).join("")}</div>`:`<span class="muted" style="font-size:.88rem">Recommended: 4 to 6 photos</span>`}</div>
+  ${nav(true,"Hand over bike","go")}`;
+}
+function b5(){
+  bindBack();
+  $("#up-bike").addEventListener("change",e=>{
+    draft.startKm=$("#f-km").value.trim();draft.fuel=$("#f-fuel").value;draft.notes=$("#f-notes").value.trim();
+    const fs=[...e.target.files];let left=fs.length;
+    fs.forEach(f=>{const r=new FileReader();r.onload=()=>{draft.photos.push(r.result);if(--left===0)renderCust()};r.readAsDataURL(f)});
+  });
+  $("#next").onclick=()=>{
+    draft.startKm=$("#f-km").value.trim();draft.fuel=$("#f-fuel").value;draft.notes=$("#f-notes").value.trim();
+    if(!/^\d{1,6}$/.test(draft.startKm)) return fail("Enter the odometer reading in km.");
+    const q=quote(bikeOf(draft.bike),draft.start,draft.due);
+    const r={no:"B/T/"+(seq++),name:draft.name,father:draft.father,phone:draft.phone,bike:draft.bike,start:draft.start,due:draft.due,startKm:+draft.startKm,fuel:draft.fuel,notes:draft.notes,paid:q.rent,status:"OUT",photos:draft.photos,sig:draft.sigImg,idVia:draft.idVia};
+    busy($("#next"),"Saving contract",()=>{rentals.unshift(r);save();updBadge();draft.last=r;step=5;renderCust();window.scrollTo({top:0});toast("Contract "+r.no+" saved")});
+  };
+}
+
+function doneHTML(){
+  const r=draft.last,b=bikeOf(r.bike),q=quote(b,r.start,r.due);
+  return `<div class="card pad panel success">
+   <div><h2 style="display:flex;gap:10px;align-items:center"><i data-lucide="circle-check" aria-hidden="true" style="color:var(--ok);width:24px;height:24px"></i>Bike handed over</h2><p class="sub" style="margin-bottom:0">The signed contract is saved. Send the customer their copy on WhatsApp.</p></div>
+   <div class="ticket">
+    <div class="top"><span class="mono">Contract No. ${r.no}</span><span class="pill neutral" style="background:var(--brand-ink);color:var(--brand)">OUT</span></div>
+    <dl>
+     <div><dt>Customer</dt><dd>${esc(r.name)}</dd></div>
+     <div><dt>S/D/W of</dt><dd>${esc(r.father)}</dd></div>
+     <div><dt>Mobile</dt><dd class="mono">${esc(r.phone)}</dd></div>
+     <div><dt>Bike</dt><dd>${b.model}<br><span class="mono">${b.id}</span></dd></div>
+     <div><dt>From</dt><dd>${fmt(r.start)}</dd></div>
+     <div><dt>Return by</dt><dd>${fmt(r.due)}</dd></div>
+     <div><dt>Start km</dt><dd class="mono">${r.startKm}</dd></div>
+     <div><dt>Free km</dt><dd>${q.km} km</dd></div>
+     <div><dt>Paid</dt><dd>${inr(q.rent)} + ${inr(DEPOSIT)} deposit</dd></div>
+     <div><dt>Fuel</dt><dd>${r.fuel}</dd></div>
+     <div><dt>ID</dt><dd>${r.idVia==="digilocker"?"DigiLocker":"Photos on file"}</dd></div>
+     ${r.notes?`<div style="grid-column:1/-1"><dt>Existing marks</dt><dd>${esc(r.notes)}</dd></div>`:""}
+    </dl>
+    ${r.sig?`<div style="padding:0 18px 12px"><dt class="muted" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.06em">Signature</dt><span class="sigchip"><img src="${r.sig}" alt="Customer signature" style="max-height:64px;max-width:100%;display:block"></span></div>`:""}
+    ${r.photos.length?`<div class="thumbs">${r.photos.map((p,i)=>`<img src="${p}" alt="Handover photo ${i+1}">`).join("")}</div>`:""}
+   </div>
+   <div class="done-actions">
+    <a class="btn go" id="wa" target="_blank" rel="noopener"><i data-lucide="send" aria-hidden="true"></i>Send copy on WhatsApp</a>
+    <button class="btn" id="toOwner">Open dashboard</button><button class="btn primary" id="again">Start new rental</button>
+   </div>
+  </div>`;
+}
+function bindDone(){
+  const r=draft.last,b=bikeOf(r.bike);
+  const msg=`Be On Time Multi Service - Bike Rental\nContract ${r.no}\n${r.name}\n${b.model} (${b.id})\nFrom: ${fmt(r.start)}\nReturn by: ${fmt(r.due)}\nStart km: ${r.startKm}\nPlease return on time. Late return is charged at double rate.`;
+  $("#wa").href="https://wa.me/91"+r.phone+"?text="+encodeURIComponent(msg);
+  $("#again").onclick=()=>{freshDraft();step=0;renderCust()};
+  $("#toOwner").onclick=()=>show("own");
+}
+
+/* ---------- owner dashboard ---------- */
+let openRet=null;
+function settle(r,endKm,at,damage){
+  const b=bikeOf(r.bike),q=quote(b,r.start,r.due);
+  const used=Math.max(0,endKm-r.startKm), exKm=Math.max(0,used-q.km), kmC=exKm*PER_KM;
+  const rateH=Math.round(b.day/24), lateH=Math.max(0,Math.ceil((at-r.due)/H-.25)), lateC=lateH*rateH*2;
+  const extra=kmC+lateC+(damage||0);
+  return {used,limit:q.km,rateH,exKm,kmC,lateH,lateC,damage:damage||0,extra,net:extra-DEPOSIT};
+}
+function renderOwner(){
+  updBadge();
+  const out=rentals.filter(r=>r.status==="OUT").sort((a,b)=>a.due-b.due);
+  const over=out.filter(r=>r.due<Date.now()).length, soon=out.filter(r=>{const l=r.due-Date.now();return l>=0&&l<=2*H}).length;
+  const today=new Date().toDateString();
+  const coll=rentals.filter(r=>new Date(r.start).toDateString()===today).reduce((s,r)=>s+r.paid,0)+rentals.filter(r=>r.returned&&new Date(r.returned.at).toDateString()===today).reduce((s,r)=>s+r.returned.extra,0);
+  const done=rentals.filter(r=>r.status==="RETURNED").sort((a,b)=>b.returned.at-a.returned.at).slice(0,5);
+  const outIds=new Set(out.map(r=>r.bike));
+  $("#view-own").innerHTML=`
+  <div class="stats">
+   <div class="card stat"><small><i data-lucide="bike" aria-hidden="true"></i>Bikes out</small><strong>${out.length}<span class="muted" style="font-size:1rem"> / ${FLEET.length}</span></strong></div>
+   <div class="card stat"><small><i data-lucide="clock-3" aria-hidden="true"></i>Due in 2 hours</small><strong>${soon}</strong></div>
+   <div class="card stat ${over?"alert":""}"><small><i data-lucide="triangle-alert" aria-hidden="true"></i>Overdue</small><strong>${over}</strong></div>
+   <div class="card stat"><small><i data-lucide="wallet" aria-hidden="true"></i>Collected today</small><strong>${inr(coll)}</strong></div>
+  </div>
+  <div class="sec-h"><h2>Bikes on rent</h2><span class="muted" style="font-size:.88rem">Soonest return first</span></div>
+  <div class="list">${out.length?out.map(rentCard).join(""):`<div class="card pad muted">No bikes on rent right now. New rentals appear here after handover.</div>`}</div>
+  <div class="sec-h"><h2>Fleet</h2></div>
+  <div class="fleet">${FLEET.map(b=>`<div class="card bike"><span class="plate">${b.id}</span><b>${b.model}</b><span class="muted" style="font-size:.88rem">${inr(b.day)} per day</span><span>${outIds.has(b.id)?`<span class="pill idle">On rent</span>`:`<span class="pill ok">Available</span>`}</span></div>`).join("")}</div>
+  <div class="sec-h"><h2>Recently returned</h2></div>
+  <div class="list">${done.length?done.map(r=>{const b=bikeOf(r.bike);return `<div class="card rent"><div class="row"><div class="who"><b>${esc(r.name)}</b>${r.example?`<span class="ex">Example</span>`:""}<div class="meta"><span class="mono">${r.no}</span><span>${b.model}</span><span>Returned ${fmt(r.returned.at)}</span><span>${r.returned.endKm-r.startKm} km ridden</span></div></div><span class="pill ${r.returned.net>0?"warn":"ok"}">${r.returned.net>0?"Collected "+inr(r.returned.net):"Refunded "+inr(-r.returned.net)}</span></div></div>`}).join(""):`<div class="card pad muted">Returned rentals will show here.</div>`}</div>`;
+  bindOwner();icons();
+}
+function rentCard(r){
+  const b=bikeOf(r.bike),[cls,txt]=statusOf(r),open=openRet===r.no;
+  return `<div class="card rent" data-no="${r.no}">
+   <div class="row"><div class="who"><b>${esc(r.name)}</b>${r.example?`<span class="ex">Example</span>`:""}
+    <div class="meta"><span class="mono">${r.no}</span><span>${b.model} · <span class="mono">${b.id}</span></span><span>Due ${fmt(r.due)}</span><span class="mono">${esc(r.phone)}</span></div></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="pill ${cls}">${txt}</span>${open?"":`<button class="btn small primary" data-act="ret">Check in return</button>`}</div></div>
+   ${open?`<div class="retbox">
+    <div class="retgrid">
+     <label class="f">Return odometer (km)<input id="r-km" inputmode="numeric" placeholder="Start was ${r.startKm}"></label>
+     <label class="f">Returned at<input type="datetime-local" id="r-at" value="${toInput(Date.now())}"></label>
+     <label class="f">Damage charge (₹)<input id="r-dmg" inputmode="numeric" value="0"></label>
+    </div>
+    ${r.notes?`<div class="note">Marked at handover: ${esc(r.notes)}</div>`:""}
+    <div class="upl"><b>Return photos</b><input type="file" accept="image/*" capture="environment" multiple id="r-ph"><span class="muted" style="font-size:.85rem">Compare with the ${r.photos&&r.photos.length?r.photos.length+" handover photos":"handover photos"} before closing.</span></div>
+    <table class="bill" id="r-bill"></table>
+    <div id="r-settle"></div>
+    <p class="err" id="r-err" role="alert"></p>
+    <div class="actions" style="margin-top:0"><button class="btn" data-act="cancel">Cancel</button><button class="btn go" data-act="close">Mark returned</button></div>
+   </div>`:""}
+  </div>`;
+}
+function bindOwner(){
+  $("#view-own").querySelectorAll("[data-act]").forEach(btn=>btn.addEventListener("click",()=>{
+    const no=btn.closest("[data-no]").dataset.no,r=rentals.find(x=>x.no===no),act=btn.dataset.act;
+    if(act==="ret"){openRet=no;renderOwner();return}
+    if(act==="cancel"){openRet=null;renderOwner();return}
+    if(act==="close"){
+      const km=+$("#r-km").value;if(!$("#r-km").value||km<r.startKm){$("#r-err").textContent="Enter a return reading equal to or above the start reading ("+r.startKm+" km).";return}
+      const at=new Date($("#r-at").value).getTime(),s=settle(r,km,at,+$("#r-dmg").value||0);
+      busy(btn,"Closing rental",()=>{r.status="RETURNED";r.returned={at,endKm:km,extra:s.extra,net:s.net};openRet=null;save();updBadge();renderOwner();toast(r.no+" returned · "+(s.net>0?"collect "+inr(s.net):"refund "+inr(-s.net)))});
+    }
+  }));
+  if(openRet){
+    const r=rentals.find(x=>x.no===openRet);
+    const upd=()=>{
+      const kmv=$("#r-km").value,km=kmv?+kmv:r.startKm,at=new Date($("#r-at").value).getTime()||Date.now(),s=settle(r,km,at,+$("#r-dmg").value||0);
+      $("#r-err").textContent="";
+      $("#r-bill").innerHTML=`<tbody>
+       <tr><td>Km ridden${kmv?"":" (enter reading)"}</td><td>${s.used} km <span class="muted">(${s.limit} free)</span></td></tr>
+       <tr><td>Extra ${s.exKm} km × ${inr(PER_KM)}</td><td>${inr(s.kmC)}</td></tr>
+       <tr><td>Late ${s.lateH} h × ${inr(s.rateH*2)}/h (double rate, 15 min grace)</td><td>${inr(s.lateC)}</td></tr>
+       <tr><td>Damage</td><td>${inr(s.damage)}</td></tr>
+       <tr class="total"><td>Extra charges</td><td>${inr(s.extra)}</td></tr></tbody>`;
+      $("#r-settle").innerHTML=s.net>0?`<div class="settle collect">Collect ${inr(s.net)} more (deposit ${inr(DEPOSIT)} used up)</div>`:`<div class="settle refund">Refund ${inr(-s.net)} of the ${inr(DEPOSIT)} deposit</div>`;
+    };
+    ["#r-km","#r-at","#r-dmg"].forEach(s=>$(s).addEventListener("input",upd));upd();
+  }
+}
+
+$("#resetDemo").onclick=()=>{try{localStorage.removeItem("vot-demo")}catch(e){}seed();save();freshDraft();step=0;openRet=null;renderCust();updBadge();if(!$("#view-own").hidden)renderOwner()};
+function route(){const c=location.hash==="#start";document.querySelector(".tabs").hidden=c;if(c)show("cust")}
+window.addEventListener("hashchange",route);route();
+renderCust();updBadge();
+setInterval(()=>{updBadge();if(!$("#view-own").hidden&&!openRet)renderOwner()},60000);
+</script>
+
+</body>
+</html>
